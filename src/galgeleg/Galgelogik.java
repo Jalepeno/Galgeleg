@@ -64,12 +64,11 @@ public class Galgelogik {
   }
 
   public void nulstil() {
-    Random random = new Random();
     brugteBogstaver.clear();
     antalForkerteBogstaver = 0;
     spilletErVundet = false;
     spilletErTabt = false;
-    ordet = muligeOrd.get(random.nextInt(muligeOrd.size()));
+    ordet = muligeOrd.get(new Random().nextInt(muligeOrd.size()));
     opdaterSynligtOrd();
   }
 
@@ -116,35 +115,29 @@ public class Galgelogik {
     System.out.println("- ordet (skult) = "+ordet);
     System.out.println("- synligtOrd = "+synligtOrd);
     System.out.println("- forkerteBogstaver = "+antalForkerteBogstaver);
-    System.out.println("- brugeBogstaver = "+brugteBogstaver);
+    System.out.println("- brugeBogstaver = " + brugteBogstaver);
     if (spilletErTabt) System.out.println("- SPILLET ER TABT");
     if (spilletErVundet) System.out.println("- SPILLET ER VUNDET");
     System.out.println("---------- ");
   }
 
 
-  public static String læsInputStreamSomStreng(InputStream is) throws IOException {
-    char[] buffer = new char[1024];
-    StringBuilder out = new StringBuilder();
-    Reader in = new InputStreamReader(is, "UTF-8");
-    int read;
-    do {
-      read = in.read(buffer, 0, buffer.length);
-      if (read>0) {
-        out.append(buffer, 0, read);
-      }
-    } while (read>=0);
-    in.close();
-    return out.toString();
+  public static String hentUrl(String url) throws IOException {
+    BufferedReader br = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
+    StringBuilder sb = new StringBuilder();
+    String linje = br.readLine();
+    while (linje!=null) {
+      sb.append(linje + "\n");
+      linje = br.readLine();
+    }
+    return sb.toString();
   }
 
-
   public void hentOrdFraDr() throws IOException {
-    URL url = new URL("http://dr.dk");
-    String data = læsInputStreamSomStreng(url.openStream());
+    String data = hentUrl("http://dr.dk");
     System.out.println("data = "+data);
 
-    data = data.replaceAll("<.+?>", " ").toLowerCase().replaceAll("[^a-zæøå]", " ").replaceAll(" [a-zæøå] ", " ");
+    data = data.replaceAll("<.+?>", " ").toLowerCase().replaceAll("[^a-zæøå]", " ");
     System.out.println("data = "+data);
     muligeOrd.clear();
     muligeOrd.addAll(new HashSet<String>(Arrays.asList(data.split(" "))));
